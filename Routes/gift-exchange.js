@@ -1,25 +1,30 @@
-import express, { request } from "express";
-import GiftExchange from "../Models/gift-exchange.js";
+const express = require("express");
+const GiftExchange = require("../Models/gift-exchange.js");
+const { BadRequestError } = require("../utils/errors.js");
 
 var route = express.Router();
 
 var users = { names: [] };
-route.post("/pairs", (req, res) => {
-	users = req.body.names;
+route.post("/pairs", (req, res, next) => {
+	users = req.body;
 	try {
-		res.send({ data: GiftExchange.pairs(users) });
+		if (!users || !users.names)
+			return next(new BadRequestError("Body cannot be empty"));
+
+		res.send(GiftExchange.pairs(users.names, next));
 	} catch (err) {
-		console.log(err);
+		return next(new BadRequestError("Body cannot be empty"));
 	}
 });
 
-route.post("/traditional", (req, res) => {
-	users = req.body.names;
+route.post("/traditional", (req, res, next) => {
+	users = req.body;
 	try {
-		res.send({ data: GiftExchange.traditional(users) });
+		if (!users) next(new BadRequestError("Body cannot be empty"));
+		res.send(GiftExchange.traditional(users.names));
 	} catch (err) {
-		console.log(err);
+		return next(new BadRequestError("Body cannot be empty"));
 	}
 });
 
-export default route;
+module.exports = route;

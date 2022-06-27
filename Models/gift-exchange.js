@@ -1,3 +1,5 @@
+const { BadRequestError } = require("../utils/errors.js");
+
 function getRandomInt(top) {
 	return Math.floor(Math.random() * (top + 1));
 }
@@ -21,29 +23,25 @@ function shuffle(array) {
 
 	return array;
 }
-export default class GiftExchange {
+class GiftExchange {
 	static pairs(names) {
-		try {
-			if (names.length % 2 == 1) throw "Eror: odd number of names";
+		if (names.length % 2 == 1)
+			throw new BadRequestError("Number of names cannot be odd");
+		var tuples = [];
+		var originalSize = names.length;
+		for (let i = 0; i < originalSize / 2; i++) {
+			let idxOne = getRandomInt(names.length - 1);
+			let nameOne = names[idxOne];
+			names.splice(idxOne, 1);
 
-			var tuples = [];
-			var originalSize = names.length;
-			for (let i = 0; i < originalSize / 2; i++) {
-				let idxOne = getRandomInt(names.length - 1);
-				let nameOne = names[idxOne];
-				names.splice(idxOne, 1);
+			let idxTwo = getRandomInt(names.length - 1);
+			let nameTwo = names[idxTwo];
+			names.splice(idxTwo, 1);
 
-				let idxTwo = getRandomInt(names.length - 1);
-				let nameTwo = names[idxTwo];
-				names.splice(idxTwo, 1);
-
-				tuples.push([nameOne, nameTwo]);
-			}
-
-			return tuples;
-		} catch (err) {
-			console.log(err);
+			tuples.push([nameOne, nameTwo]);
 		}
+
+		return tuples;
 	}
 
 	static traditional(names) {
@@ -68,3 +66,5 @@ export default class GiftExchange {
 		return response;
 	}
 }
+
+module.exports = GiftExchange;
